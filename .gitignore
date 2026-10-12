@@ -26,3 +26,6 @@ build/
 
 # Standalone calibration environment.
 .venv-calibration/
+
+# Isolated official RoboTwin runtime.
+.venv-robotwin/
