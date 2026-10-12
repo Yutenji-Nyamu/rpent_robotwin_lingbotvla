@@ -57,5 +57,7 @@
 | 23:43–23:48 | 核验RLT恢复与绑定 | driver日志明确Resuming CP375并进入rollout；12个本namespace actors存活，Actor/Rollout/Env实际C/C/C+G均仅GPU4，其他卡原PID未变。此时尚不宣称完成新一轮学习。 |
 | 23:45–23:48 | 恢复同族图服务并新增成功关键帧页 | 旧8192服务已退出；同端口启动localhost只读文件白名单服务。曲线页、关键帧页、最终PNG均HTTP200，最终图已实际查看；已请求在应用浏览器打开。 |
 | 23:48–本轮结束 | 更新并发布结果上下文 | 新增RESULTS，更新README/决策/计划/执行/合同/问题/操作/证据索引及根交接；核验Markdown链接、敏感内容、精确提交清单和运行源码未改后发布；最终提交由Git回执记录。 |
+| 23:51 | 公开结果首次推送完成 | `e1ad0a1`已在main与本次独立分支，11个变更文件包含10份专题中的更新和PROJECT_CONTEXT/轻量JSON；工作区干净，原README/LICENSE与运行源码均未改。 |
+| 23:53 | 浏览器交付与恢复链补核 | 关键帧三路图片均加载完成、320×240，初始→成功阶段切换通过，页面保留；RLT恢复首个rollout已完成并进入反向传播，尚无新TB标量。本地导出时的1.21MB base64中间文件已精确删除，仅留可用图片和小证据。 |
 
 完整机器回执与后续安装/运行日志：`/data/chenyiteng/deployment-20261012/rpent-robotwin-g4/`。本地本轮轻量核验输出位于原DETAILS证据目录，文件名 `launch-inventory.out`、`prerequisites.out`、`install-detail.out`。

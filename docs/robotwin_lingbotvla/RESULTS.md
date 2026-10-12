@@ -43,8 +43,12 @@
 
 23:39通过原逐卡owner恢复原GPU4 RLT候补，恢复点为原run的完整`global_step_375`。仅修改`runner.resume_dir`、`runner.logger.log_path`、`runner.logger.experiment_name`，原环境、算法、预算及其他卡请求保留。回执：`rlt-return-prepared.json`、`rlt-return-started.json`、`rlt-return-verified.json`；新run：`/data/chenyiteng/results/rlinf-rlt/rlt-sz3-g4-after-rpent-1012`。恢复进程存活与后续学习结果分开验收。
 
+23:53补核：恢复首个rollout已100%完成并进入反向传播；本次读取尚无新TensorBoard标量，未据此宣称新评估或学习收益。RLT图形随环境阶段释放/重建，观察到的C/G均限物理4卡，5–7卡原GPU进程仍未变。
+
 ## 可复用基础
 
 服务器仓库独立环境`.venv-robotwin`、24.3GB EEF检查点、现成RoboTwin资产和官方记忆缓存均保留。上游运行源码、依赖版本及任务协议未修改；本机不保留源码克隆或模型。具体版本、命令和预算见[FIRST_RUN](FIRST_RUN.md)，所有操作见[OPERATIONS](OPERATIONS.md)。
 
 本次单seed成功不构成成功率评估，也不复现论文整体分数；同seed纯VLA对照和扩大评估仍是后续讨论项。
+
+结果文档与[轻量原生JSON](evidence/first-success.json)已发布；首次结果提交`e1ad0a1`。浏览器实际核验三路图像均320×240且加载完成，初始/成功两阶段切换正确。
