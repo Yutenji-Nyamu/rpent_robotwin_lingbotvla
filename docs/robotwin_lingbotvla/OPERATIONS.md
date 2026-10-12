@@ -31,5 +31,31 @@
 | 22:33 | Qwen续传退回可用7890 | 7897的新CDN连接同样TLS失败；仅两个剩余分片切回7890，初始持续吞吐约2.4–2.6MiB/s，完成的主模型文件保持原位。 |
 | 22:34 | 准备SAPIEN b1单卡绑定 | 对实际下载包读取`Scene.__init__`，与已验收3.0.1方案所要求的初始化源码一致；b1的RenderSystem接口支持device字符串。复制既有bootstrap/runtime至本次deployment，仅改版本检查、清单路径与回执目录。旧NVIDIA profile、marker、旧任务代码不变；此步骤未创建GPU上下文。 |
 | 22:42 | 核验依赖编译进展 | SAPIEN、Torch/CUDA等依赖已下载，cuRobo按官方v0.7.8使用CUDA12.9编译H100扩展；官方运行环境仍待完整安装退出码。 |
+| 22:48 | 调整余下两分片的连接分配 | 同区间实测7890约101KB/s、7897 TLS失败、镜像约53KB/s。两文件各16分段续传，总32连接与此前4文件×8相同；持续总吞吐仍约2.4MiB/s，没有把瞬时峰值当成稳定速率。 |
+| 22:53 | 官方环境安装完成并做CPU预检 | 安装exit0；`uv pip check`、`rpent --help`、规划器导入均exit0。freeze共294行；Torch2.7.1、SAPIEN3.0.0b1、cuRobo0.7.8、RLinf0.4.0；未改官方版本约束。 |
+| 23:02 | 补充NVIDIA profile现场审计 | 首次CPU bootstrap以exit78指出旧清单之后新增的Norm/DSRL四条规则。逐条核对均为各自专用DSO匹配，与本次唯一预加载marker不相交；仅更新本次manifest的已审计清单。随后新环境bootstrap通过，Ray未初始化、未创建GPU上下文。 |
+| 23:03–23:05 | 准备官方HF记忆库 | 旧环境HF客户端首个metadata请求SSL EOF；新安装环境显式统一大小写代理变量后，完整取得`RLinf/RPent-memory`的`robotwin/**`：107文件、170,980字节、revision `7db66088d06d04ae097682332a09704f13e6fc0c`。官方CLI默认同步仍启用。 |
+| 23:04 | 官方`rpent-check-llm`返回未登录 | 同一环境下`codex login status`成功；源码定位到检查器只查默认登录文件，忽略本次私有CODEX_HOME。凭据不复制到全局HOME，不修改原检查器。 |
+| 23:05 | 刷新GPU4 RLT恢复点 | 原driver PID2925701/UID20001/start776290524，12个本namespace actors；GPU4三个C/C/C+G进程仍正常。最新完整checkpoint为375，`complete=true`；继续运行，尚未借卡。 |
+| 23:07 | 官方SDK实际调用通过 | 直接使用原`build_probe_config`/`run_probe_turn`核验真实认证；GPT-5.5返回`ok`，约23.7秒。只省略不识别CODEX_HOME的可选文件存在性预检查，实际服务端认证正常，RPent源码不变。 |
+| 23:20 | 模型下载完成 | 固定revision共34文件、24,326,925,903字节，6个大分片全部完成并移入正式模型目录；完整性按下载完成状态、文件清单/大小及后续原生加载验证，未重复做全量散列。 |
+| 23:20–23:21 | 精确释放GPU4 RLT | 保存CP375、原实配和环境；向PID2925701/UID20001/start776290524发SIGTERM。随后原driver消失、12个namespace actors清空、GPU4 C/G为空，旧owner记RLT_EXITED。此次中断未留下原生finished.json，保留SIGTERM/actor-kill日志；用上述现场证据写本次独立释放回执，不补造原生结束记录。 |
+| 23:22 | 启动首条官方任务 | `attempt-01`，原任务/场景/seed/预算/EEF模型不变；主进程2779504，环境2779782，LingBot服务2779783。官方记忆同步直接复用107个缓存文件。 |
+| 23:24 | 仿真服务与图形绑定核验 | Env RPC开始监听；SAPIEN绑定回执核到逻辑CUDA0=物理GPU4 UUID，实际nvidia-smi为环境C+G约2.5GiB，仅在4卡。LingBot仍加载权重，尚未宣称动作或原生成功。 |
+| 23:25 | LingBot加载完成并进入官方规划器 | 两服务就绪，原生环境已reset；GPT-5.5/xhigh通过RPent Codex SDK调用，官方记忆流程保留。 |
+| 23:26–23:27 | 规划器读取指南、场景及任务记忆 | 原生任务语言与seed核对；读取记录在服务器run.log与transcript。没有人工插入动作坐标或修改记忆。 |
+| 23:28:31 | 第一段LingBot结束 | 官方EEF模型实际推理，执行50步；eval_success=false，累计50。 |
+| 23:28:52 | 规划器调用左夹爪闭合 | set_gripper left=0，执行15步，累计65；原生尚未成功。 |
+| 23:29:31 | 规划器调用抬升原语 | move_to执行8步，cuRobo返回Success，累计73；原生尚未成功。 |
+| 23:29:58 | 第二段LingBot触发原生成功 | 请求50步，实际22步即native_success；eval_success=true，actual_seed100000，累计95。 |
+| 23:30:06 | 官方收尾导出 | 配方与transcript写入；episode.mp4报expected bytes, NoneType found，未落盘连续视频。记录I18，保留5组三路RGB与states，不补造录像。 |
+| 23:30:11 | 主进程正常退出 | wrapper原始回执exit0。Env/VLA parent-watch随后清场。 |
+| 23:37 | 复核结果和进程清场 | states有reset+4次状态推进；本次namespace无残留、GPU4 C/G为空；写attempt-01-cleanup.json。GPU5–7原进程未变。 |
+| 23:39 | 按原逐卡机制恢复RLT | 原配置只改resume_dir与两处logger输出；完整CP375。精确停止并重启CPU owner以载入slot4新request，其余slot原样保留；共享Ray和其他卡driver/actors不动。新driver339321，namespace rlt-sz3-g4-after-rpent-1012。 |
+| 23:41 | 删除本次临时Codex认证缓存 | 确认无进程使用该CODEX_HOME后，仅删除本次/dev/shm/rpent-codex-20001-20261012-g4；494项临时文件，回查不存在。默认用户登录缓存保持。 |
+| 23:42–23:44 | 导出轻量原生证据和关键帧 | 本地证据助手首读误用records键退出，按实际states.json的steps键修正；只读重导成功，未影响原始回合。15张PNG共907,135字节及小JSON；大日志与模型不回传。 |
+| 23:43–23:48 | 核验RLT恢复与绑定 | driver日志明确Resuming CP375并进入rollout；12个本namespace actors存活，Actor/Rollout/Env实际C/C/C+G均仅GPU4，其他卡原PID未变。此时尚不宣称完成新一轮学习。 |
+| 23:45–23:48 | 恢复同族图服务并新增成功关键帧页 | 旧8192服务已退出；同端口启动localhost只读文件白名单服务。曲线页、关键帧页、最终PNG均HTTP200，最终图已实际查看；已请求在应用浏览器打开。 |
+| 23:48–本轮结束 | 更新并发布结果上下文 | 新增RESULTS，更新README/决策/计划/执行/合同/问题/操作/证据索引及根交接；核验Markdown链接、敏感内容、精确提交清单和运行源码未改后发布；最终提交由Git回执记录。 |
 
 完整机器回执与后续安装/运行日志：`/data/chenyiteng/deployment-20261012/rpent-robotwin-g4/`。本地本轮轻量核验输出位于原DETAILS证据目录，文件名 `launch-inventory.out`、`prerequisites.out`、`install-detail.out`。

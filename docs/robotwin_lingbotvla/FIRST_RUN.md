@@ -39,7 +39,7 @@ rpent --robot robotwin \
   --output-dir /data/chenyiteng/results/rpent/robotwin-beat-block-hammer-s100000-g4-20261012/attempt-01
 ```
 
-Codex临时认证、CUDA工具链、代理与单卡图形绑定由本次服务器启动环境提供，不写入公开凭据。CLI会继承运行环境并分别启动Env/VLA服务。官方toolkit在`close()`时自动将记录帧写成`episode.mp4`，无需另写录制实现。
+Codex临时认证、CUDA工具链、代理与单卡图形绑定由本次服务器启动环境提供，不写入公开凭据。CLI会继承运行环境并分别启动Env/VLA服务。官方toolkit在`close()`时尝试将记录帧写成`episode.mp4`；本次该导出报`expected bytes, NoneType found`，没有落盘连续视频，关键帧与原生状态完整。此限制见I18。
 
 ## 交接与验收
 
@@ -50,4 +50,4 @@ Codex临时认证、CUDA工具链、代理与单卡图形绑定由本次服务�
 5. 停止条件为原生成功、官方预算耗尽、初始化/推理错误；越卡绑定按本次精确进程退出处理，保留错误证据。
 6. 结束后核服务进程与C/G清场，保存完整服务器日志/视频及轻量结果；按原逐卡候补机制从保留checkpoint恢复RLT。
 
-当前这是已授权的首跑配置，尚未代表回合已经启动或成功。
+2026-10-12本合同已实际执行：attempt-01原生成功、exit0、95动作、两次LingBot调用，服务与GPU上下文已清场。详情见[RESULTS](RESULTS.md)。第2项旧driver的SIGTERM路径未写原生finished.json，本次以实际driver/namespace/C/G全释放的独立回执验收，未补造正常结束记录。

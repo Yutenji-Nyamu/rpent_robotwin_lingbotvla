@@ -50,3 +50,16 @@ DSRL τ3 `finished.json`时间戳1791791858.884251、exit_code0、cleanup_error=
 - `docs/source-en/rst_source/guides/flywheel.rst`：当前LIBERO采集/导出，RLinf训练。
 
 文档检查采用上游`docs-check`说明，对独立Markdown做路径、语义和参数检查。本轮没有修改Sphinx源码或模型运行代码，未新增测试或运行训练测试。
+
+## 2026-10-12首回合证据追加
+
+当前结果见[RESULTS](RESULTS.md)。服务器部署回执根：`/data/chenyiteng/deployment-20261012/rpent-robotwin-g4/`。
+
+- 环境/下载：`cpu-preflight.json`、`environment-freeze.txt`、`model-complete.json`、`asset-reuse.json`、`memory-prefetch.json`。
+- 执行：`attempt-01-argv.json`、`attempt-01-started.json`、`attempt-01-main.json`、`attempt-01-exit.json`、`attempt-01-result.json`。
+- 单卡/退出：`attempt-01-gpu-latest.json`、`graphics-scope/receipts/`、`attempt-01-cleanup.json`、`private-auth-cleanup.json`。
+- RLT交接：`rlt-stop-requested.json`、`rlt-released-for-rpent.json`、`rlt-return-prepared.json`、`rlt-return-started.json`、`rlt-return-verified.json`。
+- 完整运行记录：`/data/chenyiteng/results/rpent/robotwin-beat-block-hammer-s100000-g4-20261012/attempt-01`。
+- 本地轻量预览：[关键帧](http://127.0.0.1:8192/rpent-success/)，15张图约0.91MB；非连续录像。源码、模型、环境和大日志仍只在服务器。
+
+这些是历史回执；以后GPU或训练状态仍须重新现场核验。

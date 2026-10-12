@@ -7,6 +7,6 @@ This public fork preserves [RLinf/RPent](https://github.com/RLinf/RPent), its hi
 - Source baseline: `161be6bfe7574c4b9770abd5b53617136127bb98`.
 - Checkpoint: `RLinf/LingBot-VLA-RoboTwin-EEF-ckpt1500`, revision `e727b46cd220b66981ea4d2fd9ba84adc189e2cc`.
 - Setup and large artifacts live on the execution server. Only reviewed source and lightweight documentation belong in this repository.
-- Current state: environment/model preparation in progress; a successful RPent robot episode has not yet been demonstrated. See the execution record for updates.
+- Current state: the first official episode succeeded on 2026-10-12: native `eval_success=true`, actual seed `100000`, 95 actions, two LingBot calls, exit code 0. See [results and limitations](docs/robotwin_lingbotvla/RESULTS.md). The full MP4 export failed; native state and three-camera keyframes are preserved.
 
 The original upstream README remains the general project introduction. Task success is the environment's native `TASK_ENV.eval_success`, recorded separately from planner completion.
