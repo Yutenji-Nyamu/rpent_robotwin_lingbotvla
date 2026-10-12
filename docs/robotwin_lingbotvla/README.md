@@ -22,6 +22,7 @@
 4. [执行：当前进展和下一步](EXECUTION.md)。
 5. [细节：现场证据、曲线口径和来源](DETAILS.md)。
 6. [逐项操作流水](OPERATIONS.md)与[问题和解决](ISSUES.md)。
+7. [首条回合配置、命令、资源和验收](FIRST_RUN.md)。
 
 ## 最近现场
 

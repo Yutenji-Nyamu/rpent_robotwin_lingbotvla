@@ -36,7 +36,7 @@
 ```bash
 cd /data/chenyiteng/projects/rpent_robotwin_lingbotvla
 source .venv-robotwin/bin/activate
-export ROBOTWIN_ASSETS_PATH=/data/chenyiteng/datasets/robotwin-assets
+export ROBOTWIN_ASSETS_PATH=/data/chenyiteng/datasets/rpent-robotwin-assets
 export LINGBOT_MODEL_PATH=/data/chenyiteng/models/LingBot-VLA-RoboTwin-EEF-ckpt1500
 rpent --robot robotwin \
   --task-name beat_block_hammer --task-config demo_randomized --seed 100000 \
@@ -45,7 +45,7 @@ rpent --robot robotwin \
   --max-turns 100 --planner-timeout-s 4800 --max-episode-steps 10000
 ```
 
-资产目录已存在待官方校验，模型目录正在下载。当前main执行这条命令也不等于复现历史62.4%；复现需另外匹配分支、记忆和评估协议。
+资产已通过官方runtime的`validate_root`与双臂cuRobo路径校验；它是复用现成资源的完整unmanaged目录，revision为null，不声称等同固定HF snapshot的全部字节。模型目录正在下载。当前main执行这条命令也不等于复现历史62.4%；复现需另外匹配分支、记忆和评估协议。
 
 ## GPU4交接
 
