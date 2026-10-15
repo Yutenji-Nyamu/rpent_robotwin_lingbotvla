@@ -281,6 +281,17 @@ def _add_cli_args(parser: argparse.ArgumentParser, use_dashboard: bool) -> None:
     )
     parser.add_argument("--env-endpoint", default=None)
     parser.add_argument("--vla-endpoint", default=None)
+    parser.add_argument("--vla-backend", choices=("lingbot", "pi05"), default="lingbot")
+    parser.add_argument(
+        "--pi05-python",
+        default=None,
+        help="Isolated interpreter for the accepted RLinf pi0.5 environment.",
+    )
+    parser.add_argument(
+        "--pi05-rlinf-repo",
+        default=None,
+        help="Accepted RLinf source checkout containing pi05_sidney_robotwin.",
+    )
     parser.add_argument(
         "--vla-model-path",
         default=os.environ.get("LINGBOT_MODEL_PATH"),
@@ -333,7 +344,9 @@ def _parse_config(args: argparse.Namespace) -> RunConfig:
         if memory_profile == "local"
         else f"{args.task_name}_s0"
     )
+    pi05 = getattr(args, "vla_backend", "lingbot") == "pi05"
     prompt_vars = {
+        "vla_backend": "pi05" if pi05 else "lingbot",
         "task_name": args.task_name,
         "seed": args.seed,
         "task_config": task_config,
@@ -368,8 +381,8 @@ def _parse_config(args: argparse.Namespace) -> RunConfig:
             "seed_mode": "exact",
             "task_config": task_config,
             "instruction": None,
-            "policy_name": MODEL_SPEC.policy_name,
-            "action_layout": MODEL_SPEC.action_layout,
+            "policy_name": "pi05_sidney_robotwin" if pi05 else MODEL_SPEC.policy_name,
+            "action_layout": "qpos14" if pi05 else MODEL_SPEC.action_layout,
             "env_cuda_device": env_cuda_device,
             "vla_cuda_device": vla_cuda_device,
         },
@@ -506,6 +519,22 @@ def _init_runtime(
     if unknown:
         raise ValueError(f"unknown RoboTwin runtime components: {sorted(unknown)}")
 
+    # Preserve the accepted pi0.5 startup order: warm the policy before SAPIEN.
+    if getattr(args, "vla_backend", "lingbot") == "pi05" and selected == available:
+        vla_daemons, vla_kwargs = _init_runtime(
+            args, output_dir, dashboard_events, {"vla"}
+        )
+        try:
+            env_daemons, env_kwargs = _init_runtime(
+                args, output_dir, dashboard_events, {"env"}
+            )
+        except Exception:
+            stop_owned_daemons(
+                {"vla": daemon for daemon in vla_daemons}, dashboard_events
+            )
+            raise
+        return [*vla_daemons, *env_daemons], {**vla_kwargs, **env_kwargs}
+
     owned_daemons: dict[str, ProcessDaemon] = {}
     env_pending: tuple[ProcessDaemon | None, Any] | None = None
     vla_pending: tuple[ProcessDaemon | None, tuple[str, int]] | None = None
@@ -555,7 +584,15 @@ def _init_runtime(
                 vla_daemon,
                 timeout_s=900.0 if vla_daemon is not None else 300.0,
             )
-            vla_kwargs = _build_vla_runtime_kwargs(endpoint)
+            if getattr(args, "vla_backend", "lingbot") == "pi05":
+                from robots.robotwin.pi05 import Pi05VLAClient
+                from rpent.utils.rpc.http_rpc import HttpRpcClient
+
+                model = Pi05VLAClient(HttpRpcClient(f"http://{host}:{port}"))
+                model.validate_contract()
+                vla_kwargs = {"model": model, "vla_backend": "pi05"}
+            else:
+                vla_kwargs = _build_vla_runtime_kwargs(endpoint)
         except Exception as exc:
             stop_owned_daemons(owned_daemons, dashboard_events)
             dashboard_events.emit(RuntimeStatusEvent("vla", "failed", error=exc))
@@ -633,6 +670,10 @@ def _spawn_vla_server(
 ) -> tuple[ProcessDaemon | None, tuple[str, int]]:
     from rpent.utils.daemon import ProcessDaemon, pick_free_port
 
+    if getattr(args, "vla_backend", "lingbot") == "pi05":
+        from robots.robotwin.pi05 import spawn_server
+
+        return spawn_server(args, output_dir)
     if args.vla_endpoint is not None:
         return None, _parse_vla_endpoint(args.vla_endpoint)
 

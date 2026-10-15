@@ -63,6 +63,7 @@ class FakeRoboTwinPrimitives:
 
     def __init__(self, **kwargs: Any) -> None:
         self.kwargs = kwargs
+        self.vla_backend = kwargs.get("vla_backend", "lingbot")
         self.status_calls = 0
         self.recording_started = False
         self.env = SimpleNamespace(last_reset_info={"actual_seed": 7})
@@ -99,6 +100,9 @@ class FakeRoboTwinPrimitives:
 
     def lingbot_act(self, **kwargs: Any) -> dict[str, Any]:
         return self._operation("lingbot_act", **kwargs)
+
+    def pi05_act(self, **kwargs: Any) -> dict[str, Any]:
+        return self._operation("pi05_act", **kwargs)
 
     def move_to(self, **kwargs: Any) -> dict[str, Any]:
         return self._operation("move_to", **kwargs)
@@ -150,9 +154,11 @@ def test_fake_and_real_implement_toolkit_primitive_protocol() -> None:
         )
 
 
+@pytest.mark.parametrize("backend", ["lingbot", "pi05"])
 def test_toolkit_constructs_and_captures_an_initial_observation(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
+    backend: str,
 ) -> None:
     FakeRoboTwinPrimitives.instances.clear()
     dumped: list[dict[str, Any]] = []
@@ -183,12 +189,22 @@ def test_toolkit_constructs_and_captures_an_initial_observation(
     )
 
     robot_toolkit = toolkit.RoboTwinToolkit(
-        runtime_kwargs={"env": object(), "model": object(), "seed": 7},
+        runtime_kwargs={
+            "env": object(),
+            "model": object(),
+            "seed": 7,
+            "vla_backend": backend,
+        },
         dashboard_events=NullDashboardEventSink(),
         memory=MemoryManager(tmp_path / "memory"),
     )
 
-    assert _tool_names(robot_toolkit) == EXPECTED_TOOLS
+    expected = (
+        EXPECTED_TOOLS
+        if backend == "lingbot"
+        else EXPECTED_TOOLS - {"lingbot_act"} | {"pi05_act"}
+    )
+    assert _tool_names(robot_toolkit) == expected
     assert _readonly_names(robot_toolkit) == COMMON_TOOLS | {
         "view_env_state",
         "sample_world_xyz",

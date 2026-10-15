@@ -40,6 +40,7 @@ if TYPE_CHECKING:
 # records only commands that actually move the robot.
 _RECIPE_ACTIONS = {
     "lingbot_act",
+    "pi05_act",
     "execute_action",
     "move_to",
     "rotate_wrist",
@@ -155,7 +156,15 @@ class RoboTwinToolkit(Toolkit):
             else:
                 handler = partial(definition, self._state)
             self.add_tool(definition.with_handler(handler))
+        policy_tool = (
+            "pi05_act" if self._primitives.vla_backend == "pi05" else "lingbot_act"
+        )
         for definition in iter_tools(self._primitives):
+            if (
+                definition.name in {"lingbot_act", "pi05_act"}
+                and definition.name != policy_tool
+            ):
+                continue
             handler = (
                 definition
                 if definition.name == "finish"

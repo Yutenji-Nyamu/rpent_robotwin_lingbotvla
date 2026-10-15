@@ -1,0 +1,43 @@
+{
+  "task": "beat_block_hammer",
+  "task_config": "demo_randomized",
+  "seed": 100000,
+  "planner": "gpt-6.1-sol",
+  "reasoning_effort": "xhigh",
+  "policy": "SidneyXie/pi05_robotwin",
+  "policy_source_revision": "e49e2ab6c11f07511573b67261bd129e88d0a416",
+  "action_layout": "absolute QPOS14",
+  "H": 50,
+  "M": 10,
+  "native": {
+    "eval_success": true,
+    "take_action_cnt": 115,
+    "step_lim": 10000,
+    "actual_seed": 100000,
+    "policy_actions": 115,
+    "native_actions": 115
+  },
+  "terminated": true,
+  "truncated": false,
+  "policy_calls": 3,
+  "actions_per_call": [
+    50,
+    50,
+    15
+  ],
+  "exit": {
+    "time": 1792076877.5420957,
+    "exit_code": 0
+  },
+  "full_result": "/data/chenyiteng/results/rpent/pi05-beat-block-hammer-s100000-g4-20261015/attempt-01",
+  "continuous_video": false,
+  "video_limitation": "Original MP4 writer failed because official robotwin extra omitted imageio-ffmpeg; keyframes are not continuous video.",
+  "keyframes": 12,
+  "unit_tests": {
+    "passed": 1226,
+    "skipped": 6
+  },
+  "focused_tests_passed": 21,
+  "memory_revision": "47f301ef33bf8d0e8c770342f16b3c39c6a0e8c1",
+  "video_dependency_fixed": "imageio-ffmpeg 0.6.0; real official environment CPU encode/decode passed; original episode video unavailable"
+}

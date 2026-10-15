@@ -53,11 +53,13 @@ class RoboTwinPrimitives:
         seed: int,
         check_cancelled: Callable[[], None],
         seed_mode: str = "exact",
+        vla_backend: str = "lingbot",
     ):
         if seed_mode != "exact":
             raise ValueError("standard RoboTwin integration requires seed_mode='exact'")
         self.env = env
         self.model = model
+        self.vla_backend = vla_backend
         self.seed = int(seed)
         self._check_cancelled = check_cancelled
         self.policy_actions = 0
@@ -233,11 +235,33 @@ class RoboTwinPrimitives:
         prompt: str | None = None,
     ) -> ToolResult:
         """Run LingBot-VLA eef16 actions using the native task instruction. The optional prompt is recorded but never sent to the policy."""
+        if self.vla_backend != "lingbot":
+            raise ValueError("lingbot_act requires the LingBot backend")
+        return self._policy_act(chunks, use_length, prompt, "ee")
+
+    @tool
+    def pi05_act(
+        self,
+        *,
+        chunks: Annotated[int, Field(ge=1, json_schema_extra={"default": 4})] = 4,
+        use_length: Annotated[
+            int, Field(json_schema_extra={"default": 50, "const": 50})
+        ] = 50,
+        prompt: str | None = None,
+    ) -> ToolResult:
+        """Run Sidney pi0.5 absolute QPOS14 chunks with the native task instruction. The optional prompt is recorded but never sent to the policy."""
+        if self.vla_backend != "pi05":
+            raise ValueError("pi05_act requires the pi0.5 backend")
+        return self._policy_act(chunks, use_length, prompt, "qpos")
+
+    def _policy_act(
+        self, chunks: int, use_length: int, prompt: str | None, action_type: str
+    ) -> ToolResult:
         if int(chunks) < 1:
             raise ValueError("chunks must be at least 1")
         if int(use_length) != MODEL_SPEC.use_length:
             raise ValueError(
-                f"RoboTwin LingBot requires use_length={MODEL_SPEC.use_length}"
+                f"RoboTwin policy requires use_length={MODEL_SPEC.use_length}"
             )
         executed = 0
         requested = int(chunks) * MODEL_SPEC.use_length
@@ -257,7 +281,7 @@ class RoboTwinPrimitives:
             self._check_cancelled()
             payload, _, _, _, info = self.env.chunk_step(
                 actions,
-                action_type="ee",
+                action_type=action_type,
                 return_all_frames=self._recording
                 and self.env.execution_capabilities.get("chunk_step_all_frames")
                 is True,

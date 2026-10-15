@@ -680,6 +680,31 @@
           },
           "required": ["status", "summary"]
         }
+      },
+      {
+        "name": "pi05_act",
+        "description": "Run Sidney pi0.5 absolute QPOS14 chunks with the native task instruction. The optional prompt is recorded but never sent to the policy.",
+        "input_schema": {
+          "properties": {
+            "chunks": {
+              "default": 4,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "use_length": {
+              "const": 50,
+              "default": 50,
+              "type": "integer"
+            },
+            "prompt": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
       }
     ],
     "robots/robodojo/tools.py": [

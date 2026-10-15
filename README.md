@@ -223,3 +223,5 @@ If you find **RPent** or **Harness VLA** helpful, please cite the paper:
 ```
 
 RPent builds on the simulators, VLA models, and training infrastructure of [RLinf](https://github.com/RLinf/RLinf), and on the agent SDKs of the broader open-source community — [pydantic-ai](https://ai.pydantic.dev/), the [Claude Agent SDK](https://docs.claude.com/en/api/agent-sdk/overview), and the OpenAI Codex SDK. Thanks to the teams behind LIBERO, RoboCasa, robosuite, MuJoCo, and openpi.
+
+Local integration: [RoboTwin + Sidney pi0.5](docs/robotwin_pi05/README.md).

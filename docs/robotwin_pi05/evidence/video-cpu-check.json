@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "frames": 3,
+  "shape": [
+    240,
+    320,
+    3
+  ],
+  "bytes": 1679,
+  "imageio_ffmpeg": "0.6.0",
+  "note": "CPU synthetic encoding check in actual official simulator environment; not episode footage"
+}
